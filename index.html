@@ -1,438 +1,549 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Minha Playlist</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Funk Playlist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#00ff66" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00ff7b">
+  <!-- Bootstrap + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
 
-<!-- iOS Support -->
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <style>
+    :root {
+      --green: #00ff66;
+      --dark: #020202;
+      --darker: #001a0e;
+      --text: #caffda;
+    }
 
-<!-- Bootstrap -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    body {
+      background: linear-gradient(140deg, var(--dark), var(--darker), #003a1f);
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+      margin: 0;
+    }
 
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    .player-card {
+      max-width: 960px;
+      margin: 0 auto;
+      background: rgba(0,0,0,0.75);
+      border: 2px solid var(--green);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0,255,102,0.4);
+      padding: 25px;
+      animation: fadeIn 0.8s ease;
+    }
 
-<style>
-body {
-    background: linear-gradient(140deg, #020202, #001a0e, #003a1f);
-    color: #caffda;
-    font-family: "Segoe UI", Arial, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 25px;
-}
+    h2 {
+      color: var(--green);
+      text-shadow: 0 0 15px var(--green);
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
 
-.player-card {
-    width: 100%;
-    max-width: 950px;
-    background: rgba(0,0,0,0.70);
-    border: 2px solid #00ff66;
-    border-radius: 18px;
-    box-shadow: 0 0 25px #00ff66a0;
-    padding: 28px;
-    animation: fadeIn .8s ease;
-}
+    .btn-green {
+      background: linear-gradient(145deg, #00e65b, #00ff85);
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      transition: all 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .btn-green:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 0 20px var(--green);
+    }
 
-h2 {
-    color: #00ff66;
-    text-shadow: 0 0 12px #00ff66, 0 0 25px #00ff66;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
+    #musicList .list-group-item {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--green);
+      color: #e8ffe9;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      padding: 12px 15px;
+      display: block;
+    }
+    #musicList .list-group-item:hover {
+      background: rgba(0,255,120,0.15);
+      transform: translateX(6px);
+    }
+    .active-track {
+      background: rgba(0,255,120,0.4) !important;
+      color: #001a0e !important;
+      font-weight: 700;
+      box-shadow: inset 0 0 15px var(--green);
+    }
 
-.btn-green {
-    background: linear-gradient(145deg, #00e65b, #00ff85);
-    border: none;
-    border-radius: 10px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    padding: 10px;
-    transition: .2s;
-}
-.btn-green:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 15px #00ff66;
-}
+    #progressContainer {
+      height: 6px;
+      background: #003a14;
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+      margin: 15px 0;
+    }
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background: var(--green);
+      transition: width 0.1s linear;
+    }
 
-#musicList .list-group-item {
-    background: rgba(0,0,0,0.65);
-    border: 1px solid #00ff66;
-    color: #e8ffe9;
-    transition: .2s;
-    cursor: pointer;
-    border-radius: 8px;
-    margin-bottom: 6px;
-}
+    #currentMusicName {
+      font-weight: bold;
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green);
+      min-height: 1.5em;
+    }
 
-#musicList .list-group-item:hover {
-    background: rgba(0,255,120,0.12);
-    transform: translateX(5px);
-}
+    .volume-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--green);
+    }
+    #volumeSlider {
+      flex: 1;
+      height: 6px;
+      background: #003a14;
+      outline: none;
+      border-radius: 3px;
+      -webkit-appearance: none;
+    }
+    #volumeSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--green);
+      border: 2px solid #001a0e;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 12px var(--green), 0 0 20px rgba(0,255,102,0.6);
+    }
 
-.active-track {
-    background: rgba(0,255,120,0.35) !important;
-    color: #003a14;
-    font-weight: 700;
-    box-shadow: inset 0 0 12px #00ff66;
-}
+    .virtual-list {
+      max-height: 500px;
+      overflow-y: auto;
+      padding-right: 8px;
+      border: 1px solid rgba(0,255,102,0.2);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.3);
+    }
+    .virtual-list::-webkit-scrollbar {
+      width: 10px;
+    }
+    .virtual-list::-webkit-scrollbar-track {
+      background: #001a0e;
+      border-radius: 5px;
+    }
+    .virtual-list::-webkit-scrollbar-thumb {
+      background: var(--green);
+      border-radius: 5px;
+      box-shadow: 0 0 10px var(--green);
+    }
 
-#currentMusicName {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #00ff66;
-    text-shadow: 0 0 8px #00ff66;
-}
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.97);}
-    to { opacity: 1; transform: scale(1);}
-}
-</style>
+    @media (max-width: 576px) {
+      .player-card { padding: 15px; }
+      h2 { font-size: 1.5rem; }
+      .virtual-list { max-height: 400px; }
+    }
+  </style>
 </head>
 <body>
-    
-    <div class="card player-card">
-        <h2 class="text-center mb-4">🎵 Playlist Funk 🎧</h2>
-        
-        <audio id="audioPlayer" class="w-100 mb-2"></audio>
-        
-        <p id="currentMusicName" class="text-center mb-3">Nenhuma música tocando</p>
-        
-        <div class="row g-2 mb-4 text-center">
-            <div class="col-3"><button class="btn-green w-100" onclick="prevMusic()"><i class="bi bi-skip-backward-fill"></i></button></div>
-            <div class="col-3"><button class="btn-green w-100" onclick="togglePlayPause()" id="playPauseBtn"><i class="bi bi-play-fill"></i></button></div>
-            <div class="col-3"><button class="btn-green w-100" onclick="toggleShuffle()"><i class="bi bi-shuffle"></i></button></div>
-            <div class="col-3"><button class="btn-green w-100" onclick="nextMusic()"><i class="bi bi-skip-forward-fill"></i></button></div>
-        </div>
-        <!-- Botão de instalar app -->
-        <div class="text-center mt-3">
-            <button id="installBtn" class="btn-green">📲 Instalar App</button>
-        </div>
-        <br>
 
-    <ul id="musicList" class="list-group bg-transparent"></ul>
+  <div class="card player-card">
+    <h2 class="text-center mb-4">Playlist Funk</h2>
 
-</div>
+    <audio id="audioPlayer" preload="metadata"></audio>
 
-<script>
-// =====================
-//    LISTA DE MÚSICAS
-// =====================
-let musics = [
-    "300 no 7(M4A_128K).m4a",
-    "365 DIAS_ 325 NA ÁGUA - MC Marks_ MC Ryan SP e MC Jvila (DJ Dael e DJ Japa NK)(M4A_128K).m4a",
-    "4 É A Posição(M4A_128K).m4a",
-    "A DANADA ME LIGANDO - MC Cebezinho_ MC Tuto e MC Kako (Love Funk _ Web Clipe) DJ Oreia(M4A_128K).m4a",
-    "A Gente Brigou(M4A_128K).m4a",
-    "ACADSEX - MC Negão Original (DJ Guh Mix)(M4A_128K).m4a",
-    "After de Bandido(M4A_128K).m4a",
-    "After do Baile(M4A_128K).m4a",
-    "Agora Vai Sentar(M4A_128K).m4a",
-    "Aí Aí Aí Que Mina Perversa(M4A_128K).m4a",
-    "AMOR É MENTIRA - PAREI DE DAR UNS TRAGOS (Clipe Oficial) MC Livinho_ DJ Arana e DJ Jeeh FDC(M4A_128K).m4a",
-    "Apeguei na Putaria(M4A_128K).m4a",
-    "AUTOMOTIVO MAZOQUISTA - MC K.K MC BN (DJ BIG ORIGINAL) MASOQUISTA GOSTA DE FICAR TODA MARCADA TIKTOK(M4A_128K).m4a",
-    "AVISA LÁ 4 - MC Kelvinho_ MC Hariel_ MC Ryan SP_ MC Neguinho do Kaxeta_ MC Daniel e Kyan [DJ Victor](M4A_128K).m4a",
-    "Avisa Lá_ Pt.3(M4A_128K).m4a",
-    "Bala Love(M4A_128K).m4a",
-    "Bbzão da Boca Inchada(M4A_128K).m4a",
-    "Boladin211_ MC Rick_ Dejinha - Penélope Charmosa (Prod. DJ All4din)(M4A_128K).m4a",
-    "BOY BESTA - MC_s Negão Original_ Joãozinho VT_ Tuto_ Kako_ Ryan SP (Clipe Oficial) DJ Matheuszin(M4A_128K).m4a",
-    "Bruxaria Automotiva Bye Bye(M4A_128K).m4a",
-    "Cachorrera e MC Kevinho - Dog Vagabundo (Video Clipe) Jorgin Deejhay _ HDUC ep.2(M4A_128K).m4a",
-    "Cama Quente(M4A_128K).m4a",
-    "CAMAROTE 25 - MC Jvila_ MC Ryan SP_ MC Negão Original e MC Joãozinho VT (GR6 Explode) DJ Dael(M4A_128K).m4a",
-    "CANSEI DE NAMORAR - MC Negão Original (DJ Guh Mix)(M4A_128K).m4a",
-    "Cara Bacana(M4A_128K).m4a",
-    "Carnaval de Vagabundo(M4A_128K).m4a",
-    "CHEGA PERTO DE MIM - MC Cebezinho e DJ Boy (Web Clipe)(M4A_128K).m4a",
-    "Cheirinho Bom(M4A_128K).m4a",
-    "COMEDINHA FICOU BRAVO - MC Negão Original_ MC Meno K e DJ Japa NK (Love Funk)(M4A_128K).m4a",
-    "Condição(M4A_128K).m4a",
-    "Cypher 1 7Lc(M4A_128K).m4a",
-    "DEIXA O CAVALO CORRER - Oldilla_ MC Luuky_ Boladin 211_ Gabb MC_ MC Tato_ Traplaudo e MC Bruno MS(M4A_128K).m4a",
-    "Desce Com a Perseguida(M4A_128K).m4a",
-    "Desce um Combo de Royal Salute(M4A_128K).m4a",
-    "Desce(M4A_128K).m4a",
-    "Diz aí qual é o plano_ - Mc Ig_ Luki_ GP_ Ryan_ PH_ Poze_ Oruam_ Traplaudo_ GH_ Nego Micha (TMOIG)(M4A_128K).m4a",
-    "DJ Boy _Seis Não é Gângster_ Mc_s Vine 7_ Don Juan_ Ryan SP_ Davi_ Tuto_ Joãozinho VT [ClipeOficial](M4A_128K).m4a",
-    "DJ Boy_ Oldilla __VÊ SE ME ACHA__ MC Cebezinho_ MC Kanhoto_ MC Kadu e MC IG (Clipe Oficial)(M4A_128K).m4a",
-    "DJ TOPO_ LIVINHO - MTG NA IMAGINAÇÃO (TOPO SESSIONS VOL.1)(M4A_128K).m4a",
-    "DJ TOPO_ SEU JORGE_ MC LEOZIN feat. MC G15 - MTG QUEM NÃO QUER SOU EU(M4A_128K).m4a",
-    "Do Jeito Que Você Mete(M4A_128K).m4a",
-    "EU ATE GOSTO DE VOCÊ_ DEIXA 3 NO PENTE - MC JACARÉ_ MC NEGÃO ORIGINAL _ JAPA NK(M4A_128K).m4a",
-    "EU CONHECI UMA NOVINHA - MC Martins SP e MC Jon (CLIPE OFICIAL) Doug Filmes(M4A_128K).m4a",
-    "EU SEI QUE NÃO É VERDADE - Yuri Redicopa_ Dnovaees (Clipe Oficial) Prod. Gexis(M4A_128K).m4a",
-    "EU VOU TACAR X ESSAS HORA DA NOITE - DJ MT OLIVEIRA(M4A_128K).m4a",
-    "Ela Voltou de Perna Bamba Remix(M4A_128K).m4a",
-    "Ela É Sensacional(M4A_128K).m4a",
-    "Ela é Profissional(M4A_128K).m4a",
-    "ELA QUER ME DA SÓ PORQUE EU SOU TRAFICANTE(M4A_128K).m4a",
-    "ELA VEM_ BROTA NO MEU SETOR - MC RODRIGO DO CN ( DJ ZIGAO E FP DO TREM BALA )(M4A_128K).m4a",
-    "Eu Catuquei(M4A_128K).m4a",
-    "Eu Conheci uma Novinha(M4A_128K).m4a",
-    "Eu Que Sabotei(M4A_128K).m4a",
-    "Eu Sou Cantor Não Sou Bandido - MC Leozinho ZS_ Mc Lele JP_ MC Joãozinho VT_ MC Marks(M4A_128K).m4a",
-    "Eu Tentei(M4A_128K).m4a",
-    "FANTASMA (versão GORDÃO DO PC)(M4A_128K).m4a",
-    "Felina(M4A_128K).m4a",
-    "FILHA DO DEPUTADO - MC IG_ MC Ryan SP_ Poze do Rodo e Oruam (GR6 Explode) DJ Glenner e Daltin Beat(M4A_128K).m4a",
-    "Fuga Na Dona de Casa(M4A_128K).m4a",
-    "Grelo _ MC Tuto - Do Job (Audio Oficial)(M4A_128K).m4a",
-    "Hoje e Sem K.O(M4A_128K).m4a",
-    "Hoje em Dia é Difícil Encontrar (Versão BH)(M4A_128K).m4a",
-    "Jogador Caro(M4A_128K).m4a",
-    "LET_S GO 4 - DJ GBR_ IG_ Ryan SP_ PH_ Davi_ Luki_ Don Juan_ Kadu _GH do 7_ GP_ TrapLaudo(M4A_128K).m4a",
-    "Loirinha do mal_ (Slowed)(M4A_128K).m4a",
-    "MALVADA - Traplaudo_ MC IG_ MC PH_ MC Don Juan e MC Ryan SP (GR6 Explode) DJ Murillo e LT no Beat(M4A_128K).m4a",
-    "Maldita de Ex(M4A_128K).m4a",
-    "Maldito Mentiroso(M4A_128K).m4a",
-    "Marcha no Foguete(M4A_128K).m4a",
-    "Maria Criminoso · DJ LP Malvadão · MC Leozinho ZS · MC Fahah(M4A_128K).m4a",
-    "MARIA MARIAH VOCÊ NÃO SAI DA MINHA CABEÇA (Clipe Oficial) MC Meno Dani_ Silva MC_ JC no Beat e DJ F7(M4A_128K).m4a",
-    "MC Cebezinho _Observando Essa Salada_  DJ Yuri Pedrada(M4A_128K).m4a",
-    "MC GP - Voltei pras puta - Cara de braba que mina maluca (DJ Gege)(M4A_128K).m4a",
-    "MC Gury - Esquema Louco (kondzilla.com)(M4A_128K).m4a",
-    "MC Hariel - Até O Sol Raiar(M4A_128K).m4a",
-    "MC J Mito - Vida de Ladrão (Funk Explode) DJ Nattan(M4A_128K).m4a",
-    "MC JACARÉ - COBRA D_ÁGUA (Clipe Oficial)(M4A_128K).m4a",
-    "MC JACARÉ - PERDEMOS MAIS UM GUERREIRO (Clipe Oficial)(M4A_128K).m4a",
-    "MC JACARÉ - SENTA E CALA A BOCA (Clipe Oficial)(M4A_128K).m4a",
-    "MC JACARÉ_ MC KEVIN O CHRIS - A CULPA NÃO É MINHA(M4A_128K).m4a",
-    "MC JACARÉ_ MC NEGÃO ORIGINAL_ DJ JAPA NK - EU ATÉ GOSTO DE VOCÊ (Clipe Oficial)(M4A_128K).m4a",
-    "MC KAIO_ MC L DA VINTE E MC AK - SOU DE TODAS (CLIPE OFICIAL) Doug Filmes(M4A_128K).m4a",
-    "MC Kekel - Partiu (KondZilla)(M4A_128K).m4a",
-    "MC Kevin O Chris e Sodré - Evoluiu (DJ JUNINHO 22) (Clipe Oficial) ADPAR PRODUÇÕES(M4A_128K).m4a",
-    "MC L Da Vinte e MC Gury - Parado no Bailão (Funk Explode)(M4A_128K).m4a",
-    "MC Lan e MC WM - Sua Amiga Vou Pegar (KondZilla)(M4A_128K).m4a",
-    "MC Leozin - Esqueci Como Namora ( Funk de BH) Prod. MC Frog(M4A_128K).m4a",
-    "MC Levin e MC GP - Não nasci pra casar - Nasci pra dar piru pras put (DJ BL)(M4A_128K).m4a",
-    "MC Livinho - Tudo de Bom (KondZilla) _ Official Music Video(M4A_128K).m4a",
-    "MC Luuky - Malvadinho  (Clipe Oficial)(M4A_128K).m4a",
-    "MC Luuky - Nem Ligo pro Amor  (Clipe Oficial) Oldilla(M4A_128K).m4a",
-    "MC Menor JP - Menina de Vermelho(M4A_128K).m4a",
-    "MC Paiva - Fala na Cara (Love Funk) DJ AK Beats(M4A_128K).m4a",
-    "MC Paiva - Magnata (Love Funk) DJ Kotim(M4A_128K).m4a",
-    "MC Pedrinho - A Escolhida (GR6 Filmes) Jorgin Deejhay(M4A_128K).m4a",
-    "MC Pedrinho - Matemática 2 (GR6 Explode) DJ Perera(M4A_128K).m4a",
-    "MC Pedrinho - Piriquita Voa 2 (GR6 Explode) DJ 900(M4A_128K).m4a",
-    "MC PH - Cheiroso e Arrumado (Fepache)(M4A_128K).m4a",
-    "MC Rhamon e MC Cebezinho - Sintonia com a Bandida (GSOUL Produções) DJ Saulinho(M4A_128K).m4a",
-    "MC Ryan SP_ MC GP_ Boladin 211_ MC Negão Original - Nóis Não é Migo 2 (DJ Japa NK) Video Clipe(M4A_128K).m4a",
-    "MC SACI - A INTERNET É TOXICA feat. MC PRETCHAKO _ DJ LC _ DJ JOÃO DA INESTAN (CLIPE OFICIAL)(M4A_128K).m4a",
-    "MC Tuto - Barbie (DJ Glenner) [Clipe Oficial](M4A_128K).m4a",
-    "MC Vitinho Avassalador - Rolézin (kondzilla.com)(M4A_128K).m4a",
-    "MC Zaquin e MC Rick - Loucura Que Ela Fez Comigo (Funk Explode)(M4A_128K).m4a",
-    "MCs Ryan SP_ Luuky_ Don Juan_ IG_ Boladin 211_ Neguinho do Kaxeta e Oldilla - Não Bebo Não Fumo Mais(M4A_128K).m4a",
-    "Mc Kauãzinho - Deixa Ela Dançar _ Deixa Ela Mexer a Bunda _ Funk Com Grave Forte Canal Sr. Bart(M4A_128K).m4a",
-    "Mc Paulin da Capital e Mc Lemos - Tiger Triumph (Love Funk) DJ CK(M4A_128K).m4a",
-    "Mc Tuto - 2025 (DJ OREIA _ 2T) (Visualizer)(M4A_128K).m4a",
-    "ME POSTOU NO DAILY - FESTA DO BIG G(M4A_128K).m4a",
-    "MEDLEY DE IGARATÁ 4 - MC Negão Original (Web Clipe) DJ Guh Mix(M4A_128K).m4a",
-    "MEDLEY DE IGARATÁ 5 - MC Negão Original e MC IG (Clipe Oficial) DJ Guh Mix_ DJ Glenner e DJ Oreia(M4A_128K).m4a",
-    "Medley de Igaratá 3(M4A_128K).m4a",
-    "Modo Liderança(M4A_128K).m4a",
-    "MONTAGEM BAILÃO(M4A_128K).m4a",
-    "MONTAGEM CAMERA LENTA(M4A_128K).m4a",
-    "Montagem Totally Strange(M4A_128K).m4a",
-    "Motel de Motor(M4A_128K).m4a",
-    "Movimento Circular - MCs Kako_ Dkziin_ Vine7_ Joãozinho VT_ Rodolfinho (DJ JR no Beat) Clipe Oficial(M4A_128K).m4a",
-    "MTG Perna Bamba X Piranhas do Helipa(M4A_128K).m4a",
-    "MTG Pode Me Bloquear(M4A_128K).m4a",
-    "Mtg Quero Te Encontrar - Humberto e Ronaldo_ Mc Mininin_ Silvanno Salles_Dj Lg Prod Dj Jz(M4A_128K).m4a",
-    "Na Brisa Que É Bom Vs Cheiro do Skunk(M4A_128K).m4a",
-    "NOITE DOS PERDIDOS - MC Rodrigo do CN_ MC Dudu Sk_ DJ JV DO SG_ DJ WV (Clipe Oficial)(M4A_128K).m4a",
-    "Não Conta pra Ninguém(M4A_128K).m4a",
-    "Não Me Esqueço(M4A_128K).m4a",
-    "Nostalgia(M4A_128K).m4a",
-    "Oruam ft. Zé Felipe_ Mc Tuto_ Rodrigo do CN - OH GAROTA QUERO VOCE SO PRA MIM (prod. DJ LC da Roça)(M4A_128K).m4a",
-    "Os Bico Tão Se Perguntando (Let_s Go 3)(M4A_128K).m4a",
-    "Os Menino Tá Com o Pacote - MC PH (GR6 Explode) DJ Murillo e LT_ Solanno e Frank(M4A_128K).m4a",
-    "Outfit Valioso(M4A_128K).m4a",
-    "Orochi _SEREIA _ feat. Ryan SP_ Xamã_ Oruam ( prod. NeoBeats_ Kizzy )(M4A_128K).m4a",
-    "Para Que Tá Feio(M4A_128K).m4a",
-    "PEDRO SAMPAIO - POCPOC (Coreografia Oficial)(M4A_128K).m4a",
-    "PEDRO SAMPAIO - SEQUÊNCIA FEITICEIRA feat MC GW_ MC Rodrigo do CN_ MC Jhey_ MC Nito(M4A_128K).m4a",
-    "Pelo Menos(M4A_128K).m4a",
-    "Penélope Charmosa 2 - Boladin 211_ Mc Rick_ Dejinha ( DJ all4ddin )(M4A_128K).m4a",
-    "Pix ou Presente_(M4A_128K).m4a",
-    "Porta da Lojinha(M4A_128K).m4a",
-    "Posso Até Não Te Da Flores - MC Ryan SP_ MC Jacaré e MC Meno K (DJ Japa NK e DJ Davi DogDog)(M4A_128K).m4a",
-    "Privilégio(M4A_128K).m4a",
-    "PROCEDIMENTO DA CASA - MC MENO K MC NEGÃO ORIGINAL e MC RYAN SP(M4A_128K).m4a",
-    "PUTA RARA_ PUTA MEXICANA - VAI SUA CAVALONA (Clipe Oficial) Jeeh FDC_ Menor MT_ Yuri Redicopa_ Pelé(M4A_128K).m4a",
-    "Puta É Só um Detalhe(M4A_128K).m4a",
-    "QUEBRADAS - MC Paulin da Capital_ MC Lipi_ MC Cabelinho e DJ GM (Love Funk)(M4A_128K).m4a",
-    "Que Saudade da Danada(M4A_128K).m4a",
-    "Replay(M4A_128K).m4a",
-    "RITMISTA 1.0 - DJ WN_ Hariel_ Ryan SP_ Nog_ Kadu_ Vinny_ Paulin da Capital_ Lipi_Daniel_Gabb_GH do 7(M4A_128K).m4a",
-    "ROMANCE FDP (Clipe Oficial) MC Jhey e DJ Voltz(M4A_128K).m4a",
-    "SEMPRE NA SIMPLICIDADE - MC Ryan SP_ MC Luuky_ Boladin 211 e MC Vine 7 (GR6 Explode) DJ Victor(M4A_128K).m4a",
-    "SET DJ Boy 3.0 - MC_s Vine7_ Don Juan_ Hariel_ Tuto_ Kako_ Joãozinho VT e Marks [Clipe Oficial](M4A_128K).m4a",
-    "SET DJ GM 6.0 - Grego_ Paiva_ Cebezinho_ Ryan_ Lipi_ Paulin_ Triz_ Marks_ Gabb_ Lele_Daniel_Negão_GH(M4A_128K).m4a",
-    "SEXTA-FEIRA _HOJE TEM_- MC Ryan SP_ Boladin 211_ MC Negão Original_ MC Luuky_ MC IG e Nilo (JAPA NK)(M4A_128K).m4a",
-    "SÓ MENINA LINDA - Ryan SP_ Boladin 211_ Bruno MS_ Luuky_ Daniel_ Negão Original e GH do 7 (Japa NK)(M4A_128K).m4a",
-    "Senta e Cala a Boca(M4A_128K).m4a",
-    "Separei(M4A_128K).m4a",
-    "Set Wesley Alemão(M4A_128K).m4a",
-    "Set do Arnon do Grau(M4A_128K).m4a",
-    "Sexta Feira Hoje Tem(M4A_128K).m4a",
-    "Sextou(M4A_128K).m4a",
-    "Só Catucadão(M4A_128K).m4a",
-    "TIPO EINSTEIN - DJ KATRIP_ DJ CZ_ MC JHEY FEAT. MC YURI(M4A_128K).m4a",
-    "TROPA DO PISA - MC PH e TrapLaudo (GR6 Explode) DJ Murillo e LT No Beat(M4A_128K).m4a",
-    "Tropa do Sem K.O - MC_s Joãozinho VT_ Vine 7_ Tuto_ Duzinho SP_ Luuky e Ryan SP (Caio Passos)(M4A_128K).m4a",
-    "Tu Sentando(M4A_128K).m4a",
-    "Tá Doida(M4A_128K).m4a",
-    "Te Levei Pro Beco(M4A_128K).m4a",
-    "Te Prometo(M4A_128K).m4a",
-    "Toma Tapa(M4A_128K).m4a",
-    "Tubarão Gigante(M4A_128K).m4a",
-    "Tô na Brasilia com o Zigão(M4A_128K).m4a",
-    "Uma nora pra cada dia(M4A_128K).m4a",
-    "VAI NO CHÃO BANDIDA_ ELA VIU QUE O PAI É BRABO - Dj Guuh_ Mc Rodrigo Do Cn E Mc Talibã(M4A_128K).m4a",
-    "Vizinha Gostosa(M4A_128K).m4a",
-    "Vou Parar de Tomar Gin(M4A_128K).m4a",
-    "Vou pela Madrugada(M4A_128K).m4a",
-    "Whisky Importado - Nilo_ MC Marks _ MC Robs (Clipe Oficial) Prod - Dj Di Marques(M4A_128K).m4a",
-    "ZN DO PRIVACY(M4A_128K).m4a",
-    "ZN PITBULL (GP DA ZL) - MC JHEY(M4A_128K).m4a",
-    "__Banco do Carona__ - Don Juan_ Marks_ Joaozinho VT_ Kako_ Robs_ Gabb e Vine 7 (GR6 Explode) DJ Boy(M4A_128K).m4a",
-    "__DESACATO__ Luuky_ Ryan SP_ Davi_ Traplaudo_ Don Juan_ Kadu_ Gui da Norte (GR6 Explode)(M4A_128K).m4a",
-    "_A BEBÊ QUER O QUE_ MC Cebezinho _ MC Don Juan_ MC GP_ Menor Richard - DJ Oreia(M4A_128K).m4a",
-    "_Longe de Magnata_ - MC Tuto_ MC Vine7_ MC Joãozinho VT_ Borges_ MC Kako e Chefin (Deejhay RB)(M4A_128K).m4a",
-    "_Olha Pra Minha Cara Não_ MC Cebezinho_ MC Ryan SP_ MC Luuky_ MC Menor K_ Menor Richard - DJ Oreia(M4A_128K).m4a",
-    "Água Rosa(M4A_128K).m4a",
-    "Agudo Mágico 3(M4A_128K).m4a",
-    "Agudo Mágico 4(M4A_128K).m4a",
-    "Agudo Mágico 6(M4A_128K).m4a",
-    "Deixa Eu Ser Seu Romeu(M4A_128K).m4a",
-    "É OS BIGODES DA FIRMA - MC Paiva (Love Funk) SXSS(M4A_128K).m4a",
-    "É Os Pé Na Porta(M4A_128K).m4a",
-    "Ô Moça(M4A_128K).m4a"
+    <p id="currentMusicName" class="text-center mb-2">Se خبر uma música</p>
+    <div class="text-center small text-muted mb-3">
+      <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+    </div>
+
+    <div id="progressContainer" onclick="seek(event)">
+      <div id="progressBar"></div>
+    </div>
+
+    <!-- BOTÕES COM ÍCONES -->
+    <div class="row g-2 mb-3 text-center">
+      <div class="col-3"><button class="btn btn-green w-100" onclick="prevMusic()" aria-label="Anterior"><i class="bi bi-skip-backward-fill"></i></button></div>
+      <div class="col-3"><button class="btn btn-green w-100" onclick="togglePlayPause()" id="playPauseBtn" aria-label="Play/Pause"><i class="bi bi-play-fill"></i></button></div>
+      <div class="col-3"><button class="btn btn-green w-100" onclick="toggleShuffle()" id="shuffleBtn" aria-label="Aleatório"><i class="bi bi-shuffle"></i></button></div>
+      <div class="col-3"><button class="btn btn-green w-100" onclick="nextMusic()" aria-label="Próxima"><i class="bi bi-skip-forward-fill"></i></button></div>
+    </div>
+
+    <div class="volume-container mb-4">
+      <i class="bi bi-volume-up"></i>
+      <input type="range" id="volumeSlider" min="0" max="100" value="70" class="form-range">
+    </div>
+
+    <!-- BOTÕES: INSTALAR + BAIXAR APP -->
+    <div class="text-center mb-3 d-flex justify-content-center gap-2">
+      <button id="installBtn" class="btn btn-green" style="display:none;">Instalar App</button>
+      <button id="downloadAppBtn" class="btn btn-green">Baixar App</button>
+    </div>
+
+    <div id="musicList" class="virtual-list list-group"></div>
+  </div>
+
+  <script>
+    // === LISTA DE MÚSICAS (191 itens) ===
+    const musics = [
+  "300 no 7(M4A_128K).m4a",
+  "365 DIAS_ 325 NA ÁGUA - MC Marks_ MC Ryan SP e MC JVila (DJ Dael e DJ Japa NK)(M4A_128K).m4a",
+  "4 É A Posição(M4A_128K).m4a",
+  "A DANADA ME LIGANDO - MC Cebezinho_ MC Tuto e MC Kako (Love Funk _ Web Clipe) DJ Oreia(M4A_128K).m4a",
+  "A Gente Brigou(M4A_128K).m4a",
+  "ACADSEX - MC Negão Original (DJ Guh Mix)(M4A_128K).m4a",
+  "After de Bandido(M4A_128K).m4a",
+  "After do Baile(M4A_128K).m4a",
+  "Agora Vai Sentar(M4A_128K).m4a",
+  "Agudo Mágico 3(M4A_128K).m4a",
+  "Agudo Mágico 4(M4A_128K).m4a",
+  "Agudo Mágico 6(M4A_128K).m4a",
+  "AMOR É MENTIRA - PAREI DE DAR UNS TRAGOS (Clipe Oficial) MC Livinho_ DJ Arana e DJ Jeeh FDC(M4A_128K).m4a",
+  "Apeguei na Putaria(M4A_128K).m4a",
+  "AUTOMOTIVO MAZOQUISTA - MC K.K MC BN (DJ BIG ORIGINAL) MASOQUISTA GOSTA DE FICAR TODA MARCADA TIKTOK(M4A_128K).m4a",
+  "AVISA LÁ 4 - MC Kelvinho_ MC Hariel_ MC Ryan SP_ MC Neguinho do Kaxeta_ MC Daniel e Kyan [DJ Victor](M4A_128K).m4a",
+  "Avisa Lá_ Pt.3(M4A_128K).m4a",
+  "Aí Aí Aí Que Mina Perversa(M4A_128K).m4a",
+  "Bala Love(M4A_128K).m4a",
+  "Bbzão da Boca Inchada(M4A_128K).m4a",
+  "Boladin211_ MC Rick_ Dejinha - Penélope Charmosa (Prod. DJ All4din)(M4A_128K).m4a",
+  "BOY BESTA - MC_s Negão Original_ Joãozinho VT_ Tuto_ Kako_ Ryan SP (Clipe Oficial) DJ Matheuszin(M4A_128K).m4a",
+  "Bruxaria Automotiva Bye Bye(M4A_128K).m4a",
+  "Cachorrera e MC Kevinho - Dog Vagabundo (Video Clipe) Jorgin Deejhay _ HDUC ep.2(M4A_128K).m4a",
+  "Cama Quente(M4A_128K).m4a",
+  "CAMAROTE 25 - MC Jvila_ MC Ryan SP_ MC Negão Original e MC Joãozinho VT (GR6 Explode) DJ Dael(M4A_128K).m4a",
+  "CANSEI DE NAMORAR - MC Negão Original (DJ Guh Mix)(M4A_128K).m4a",
+  "Cara Bacana(M4A_128K).m4a",
+  "Carnaval de Vagabundo(M4A_128K).m4a",
+  "CHEGA PERTO DE MIM - MC Cebezinho e DJ Boy (Web Clipe)(M4A_128K).m4a",
+  "Cheirinho Bom(M4A_128K).m4a",
+  "COMEDINHA FICOU BRAVO - MC Negão Original_ MC Meno K e DJ Japa NK (Love Funk)(M4A_128K).m4a",
+  "Condição(M4A_128K).m4a",
+  "Cypher 1 7Lc(M4A_128K).m4a",
+  "Deixa Eu Ser Seu Romeu(M4A_128K).m4a",
+  "DEIXA O CAVALO CORRER - Oldilla_ MC Luuky_ Boladin 211_ Gabb MC_ MC Tato_ Traplaudo e MC Bruno MS(M4A_128K).m4a",
+  "Desce Com a Perseguida(M4A_128K).m4a",
+  "Desce um Combo de Royal Salute(M4A_128K).m4a",
+  "Desce(M4A_128K).m4a",
+  "Diz aí qual é o plano_ - Mc Ig_ Luki_ GP_ Ryan_ PH_ Poze_ Oruam_ Traplaudo_ GH_ Nego Micha (TMOIG)(M4A_128K).m4a",
+  "DJ Boy _Seis Não é Gângster_ Mc_s Vine 7_ Don Juan_ Ryan SP_ Davi_ Tuto_ Joãozinho VT [ClipeOficial](M4A_128K).m4a",
+  "DJ Boy_ Oldilla __VÊ SE ME ACHA__ MC Cebezinho_ MC Kanhoto_ MC Kadu e MC IG (Clipe Oficial)(M4A_128K).m4a",
+  "DJ TOPO_ LIVINHO - MTG NA IMAGINAÇÃO (TOPO SESSIONS VOL.1)(M4A_128K).m4a",
+  "DJ TOPO_ SEU JORGE_ MC LEOZIN feat. MC G15 - MTG QUEM NÃO QUER SOU EU(M4A_128K).m4a",
+  "Do Jeito Que Você Mete(M4A_128K).m4a",
+  "ELA QUER ME DA SÓ PORQUE EU SOU TRAFICANTE(M4A_128K).m4a",
+  "ELA VEM_ BROTA NO MEU SETOR - MC RODRIGO DO CN ( DJ ZIGAO E FP DO TREM BALA )(M4A_128K).m4a",
+  "Ela Voltou de Perna Bamba Remix(M4A_128K).m4a",
+  "Ela é Profissional(M4A_128K).m4a",
+  "Ela É Sensacional(M4A_128K).m4a",
+  "EU ATE GOSTO DE VOCÊ_ DEIXA 3 NO PENTE - MC JACARÉ_ MC NEGÃO ORIGINAL _ JAPA NK(M4A_128K).m4a",
+  "Eu Catuquei(M4A_128K).m4a",
+  "EU CONHECI UMA NOVINHA - MC Martins SP e MC Jon (CLIPE OFICIAL) Doug Filmes(M4A_128K).m4a",
+  "Eu Conheci uma Novinha(M4A_128K).m4a",
+  "Eu Que Sabotei(M4A_128K).m4a",
+  "EU SEI QUE NÃO É VERDADE - Yuri Redicopa_ Dnovaees (Clipe Oficial) Prod. Gexis(M4A_128K).m4a",
+  "Eu Sou Cantor Não Sou Bandido - MC Leozinho ZS_ Mc Lele JP_ MC Joãozinho VT_ MC Marks(M4A_128K).m4a",
+  "Eu Tentei(M4A_128K).m4a",
+  "EU VOU TACAR X ESSAS HORA DA NOITE - DJ MT OLIVEIRA(M4A_128K).m4a",
+  "FANTASMA (versão GORDÃO DO PC)(M4A_128K).m4a",
+  "Felina(M4A_128K).m4a",
+  "FILHA DO DEPUTADO - MC IG_ MC Ryan SP_ Poze do Rodo e Oruam (GR6 Explode) DJ Glenner e Daltin Beat(M4A_128K).m4a",
+  "Fuga Na Dona de Casa(M4A_128K).m4a",
+  "Grelo _ MC Tuto - Do Job (Audio Oficial)(M4A_128K).m4a",
+  "Hoje e Sem K.O(M4A_128K).m4a",
+  "Hoje em Dia é Difícil Encontrar (Versão BH)(M4A_128K).m4a",
+  "Jogador Caro(M4A_128K).m4a",
+  "LET_S GO 4 - DJ GBR_ IG_ Ryan SP_ PH_ Davi_ Luki_ Don Juan_ Kadu _GH do 7_ GP_ TrapLaudo(M4A_128K).m4a",
+  "Loirinha do mal_ (Slowed)(M4A_128K).m4a",
+  "Maldita de Ex(M4A_128K).m4a",
+  "Maldito Mentiroso(M4A_128K).m4a",
+  "MALVADA - Traplaudo_ MC IG_ MC PH_ MC Don Juan e MC Ryan SP (GR6 Explode) DJ Murillo e LT no Beat(M4A_128K).m4a",
+  "Marcha no Foguete(M4A_128K).m4a",
+  "Maria Criminoso · DJ LP Malvadão · MC Leozinho ZS · MC Fahah(M4A_128K).m4a",
+  "MARIA MARIAH VOCÊ NÃO SAI DA MINHA CABEÇA (Clipe Oficial) MC Meno Dani_ Silva MC_ JC no Beat e DJ F7(M4A_128K).m4a",
+  "MC Cebezinho _Observando Essa Salada_ DJ Yuri Pedrada(M4A_128K).m4a",
+  "MC GP - Voltei pras puta - Cara de braba que mina maluca (DJ Gege)(M4A_128K).m4a",
+  "MC Gury - Esquema Louco (kondzilla.com)(M4A_128K).m4a",
+  "MC Hariel - Até O Sol Raiar(M4A_128K).m4a",
+  "MC J Mito - Vida de Ladrão (Funk Explode) DJ Nattan(M4A_128K).m4a",
+  "MC JACARÉ - COBRA D_ÁGUA (Clipe Oficial)(M4A_128K).m4a",
+  "MC JACARÉ - PERDEMOS MAIS UM GUERREIRO (Clipe Oficial)(M4A_128K).m4a",
+  "MC JACARÉ - SENTA E CALA A BOCA (Clipe Oficial)(M4A_128K).m4a",
+  "MC JACARÉ_ MC KEVIN O CHRIS - A CULPA NÃO É MINHA(M4A_128K).m4a",
+  "MC JACARÉ_ MC NEGÃO ORIGINAL_ DJ JAPA NK - EU ATÉ GOSTO DE VOCÊ (Clipe Oficial)(M4A_128K).m4a",
+  "MC KAIO_ MC L DA VINTE E MC AK - SOU DE TODAS (CLIPE OFICIAL) Doug Filmes(M4A_128K).m4a",
+  "Mc Kauãzinho - Deixa Ela Dançar _ Deixa Ela Mexer a Bunda _ Funk Com Grave Forte Canal Sr. Bart(M4A_128K).m4a",
+  "MC Kekel - Partiu (KondZilla)(M4A_128K).m4a",
+  "MC Kevin O Chris e Sodré - Evoluiu (DJ JUNINHO 22) (Clipe Oficial) ADPAR PRODUÇÕES(M4A_128K).m4a",
+  "MC L Da Vinte e MC Gury - Parado no Bailão (Funk Explode)(M4A_128K).m4a",
+  "MC Lan e MC WM - Sua Amiga Vou Pegar (KondZilla)(M4A_128K).m4a",
+  "MC Leozin - Esqueci Como Namora ( Funk de BH) Prod. MC Frog(M4A_128K).m4a",
+  "MC Levin e MC GP - Não nasci pra casar - Nasci pra dar piru pras put (DJ BL)(M4A_128K).m4a",
+  "MC Livinho - Tudo de Bom (KondZilla) _ Official Music Video(M4A_128K).m4a",
+  "MC Luuky - Malvadinho (Clipe Oficial)(M4A_128K).m4a",
+  "MC Luuky - Nem Ligo pro Amor (Clipe Oficial) Oldilla(M4A_128K).m4a",
+  "MC Menor JP - Menina de Vermelho(M4A_128K).m4a",
+  "MC Paiva - Fala na Cara (Love Funk) DJ AK Beats(M4A_128K).m4a",
+  "MC Paiva - Magnata (Love Funk) DJ Kotim(M4A_128K).m4a",
+  "Mc Paulin da Capital e Mc Lemos - Tiger Triumph (Love Funk) DJ CK(M4A_128K).m4a",
+  "MC Pedrinho - A Escolhida (GR6 Filmes) Jorgin Deejhay(M4A_128K).m4a",
+  "MC Pedrinho - Matemática 2 (GR6 Explode) DJ Perera(M4A_128K).m4a",
+  "MC Pedrinho - Piriquita Voa 2 (GR6 Explode) DJ 900(M4A_128K).m4a",
+  "MC PH - Cheiroso e Arrumado (Fepache)(M4A_128K).m4a",
+  "MC Rhamon e MC Cebezinho - Sintonia com a Bandida (GSOUL Produções) DJ Saulinho(M4A_128K).m4a",
+  "MC Ryan SP_ MC GP_ Boladin 211_ MC Negão Original - Nóis Não é Migo 2 (DJ Japa NK) Video Clipe(M4A_128K).m4a",
+  "MC SACI - A INTERNET É TOXICA feat. MC PRETCHAKO _ DJ LC _ DJ JOÃO DA INESTAN (CLIPE OFICIAL)(M4A_128K).m4a",
+  "Mc Tuto - 2025 (DJ OREIA _ 2T) (Visualizer)(M4A_128K).m4a",
+  "MC Tuto - Barbie (DJ Glenner) [Clipe Oficial](M4A_128K).m4a",
+  "MC Vitinho Avassalador - Rolézin (kondzilla.com)(M4A_128K).m4a",
+  "MC Zaquin e MC Rick - Loucura Que Ela Fez Comigo (Funk Explode)(M4A_128K).m4a",
+  "MCs Ryan SP_ Luuky_ Don Juan_ IG_ Boladin 211_ Neguinho do Kaxeta e Oldilla - Não Bebo Não Fumo Mais(M4A_128K).m4a",
+  "ME POSTOU NO DAILY - FESTA DO BIG G(M4A_128K).m4a",
+  "Medley de Igaratá 3(M4A_128K).m4a",
+  "MEDLEY DE IGARATÁ 4 - MC Negão Original (Web Clipe) DJ Guh Mix(M4A_128K).m4a",
+  "MEDLEY DE IGARATÁ 5 - MC Negão Original e MC IG (Clipe Oficial) DJ Guh Mix_ DJ Glenner e DJ Oreia(M4A_128K).m4a",
+  "Modo Liderança(M4A_128K).m4a",
+  "MONTAGEM BAILÃO(M4A_128K).m4a",
+  "MONTAGEM CAMERA LENTA(M4A_128K).m4a",
+  "Montagem Totally Strange(M4A_128K).m4a",
+  "Motel de Motor(M4A_128K).m4a",
+  "Movimento Circular - MCs Kako_ Dkziin_ Vine7_ Joãozinho VT_ Rodolfinho (DJ JR no Beat) Clipe Oficial(M4A_128K).m4a",
+  "MTG Perna Bamba X Piranhas do Helipa(M4A_128K).m4a",
+  "MTG Pode Me Bloquear(M4A_128K).m4a",
+  "Mtg Quero Te Encontrar - Humberto e Ronaldo_ Mc Mininin_ Silvanno Salles_Dj Lg Prod Dj Jz(M4A_128K).m4a",
+  "Na Brisa Que É Bom Vs Cheiro do Skunk(M4A_128K).m4a",
+  "NOITE DOS PERDIDOS - MC Rodrigo do CN_ MC Dudu Sk_ DJ JV DO SG_ DJ WV (Clipe Oficial)(M4A_128K).m4a",
+  "Nostalgia(M4A_128K).m4a",
+  "Não Conta pra Ninguém(M4A_128K).m4a",
+  "Não Me Esqueço(M4A_128K).m4a",
+  "Orochi _SEREIA _ feat. Ryan SP_ Xamã_ Oruam ( prod. NeoBeats_ Kizzy )(M4A_128K).m4a",
+  "Oruam ft. Zé Felipe_ Mc Tuto_ Rodrigo do CN - OH GAROTA QUERO VOCE SO PRA MIM (prod. DJ LC da Roça)(M4A_128K).m4a",
+  "Os Bico Tão Se Perguntando (Let_s Go 3)(M4A_128K).m4a",
+  "Os Menino Tá Com o Pacote - MC PH (GR6 Explode) DJ Murillo e LT_ Solanno e Frank(M4A_128K).m4a",
+  "Outfit Valioso(M4A_128K).m4a",
+  "Para Que Tá Feio(M4A_128K).m4a",
+  "PEDRO SAMPAIO - POCPOC (Coreografia Oficial)(M4A_128K).m4a",
+  "PEDRO SAMPAIO - SEQUÊNCIA FEITICEIRA feat MC GW_ MC Rodrigo do CN_ MC Jhey_ MC Nito(M4A_128K).m4a",
+  "Pelo Menos(M4A_128K).m4a",
+  "Penélope Charmosa 2 - Boladin 211_ Mc Rick_ Dejinha ( DJ all4ddin )(M4A_128K).m4a",
+  "Pix ou Presente_(M4A_128K).m4a",
+  "Porta da Lojinha(M4A_128K).m4a",
+  "Posso Até Não Te Da Flores - MC Ryan SP_ MC Jacaré e MC Meno K (DJ Japa NK e DJ Davi DogDog)(M4A_128K).m4a",
+  "Privilégio(M4A_128K).m4a",
+  "PROCEDIMENTO DA CASA - MC MENO K MC NEGÃO ORIGINAL e MC RYAN SP(M4A_128K).m4a",
+  "PUTA RARA_ PUTA MEXICANA - VAI SUA CAVALONA (Clipe Oficial) Jeeh FDC_ Menor MT_ Yuri Redicopa_ Pelé(M4A_128K).m4a",
+  "Puta É Só um Detalhe(M4A_128K).m4a",
+  "Que Saudade da Danada(M4A_128K).m4a",
+  "QUEBRADAS - MC Paulin da Capital_ MC Lipi_ MC Cabelinho e DJ GM (Love Funk)(M4A_128K).m4a",
+  "Replay(M4A_128K).m4a",
+  "RITMISTA 1.0 - DJ WN_ Hariel_ Ryan SP_ Nog_ Kadu_ Vinny_ Paulin da Capital_ Lipi_Daniel_Gabb_GH do 7(M4A_128K).m4a",
+  "ROMANCE FDP (Clipe Oficial) MC Jhey e DJ Voltz(M4A_128K).m4a",
+  "SEMPRE NA SIMPLICIDADE - MC Ryan SP_ MC Luuky_ Boladin 211 e MC Vine 7 (GR6 Explode) DJ Victor(M4A_128K).m4a",
+  "Senta e Cala a Boca(M4A_128K).m4a",
+  "Separei(M4A_128K).m4a",
+  "SET DJ Boy 3.0 - MC_s Vine7_ Don Juan_ Hariel_ Tuto_ Kako_ Joãozinho VT e Marks [Clipe Oficial](M4A_128K).m4a",
+  "SET DJ GM 6.0 - Grego_ Paiva_ Cebezinho_ Ryan_ Lipi_ Paulin_ Triz_ Marks_ Gabb_ Lele_Daniel_Negão_GH(M4A_128K).m4a",
+  "Set do Arnon do Grau(M4A_128K).m4a",
+  "Set Wesley Alemão(M4A_128K).m4a",
+  "Sexta Feira Hoje Tem(M4,M4A_128K).m4a",
+  "SEXTA-FEIRA _HOJE TEM_- MC Ryan SP_ Boladin 211_ MC Negão Original_ MC Luuky_ MC IG e Nilo (JAPA NK)(M4A_128K).m4a",
+  "Sextou(M4A_128K).m4a",
+  "Só Catucadão(M4A_128K).m4a",
+  "SÓ MENINA LINDA - Ryan SP_ Boladin 211_ Bruno MS_ Luuky_ Daniel_ Negão Original e GH do 7 (Japa NK)(M4A_128K).m4a",
+  "Te Levei Pro Beco(M4A_128K).m4a",
+  "Te Prometo(M4A_128K).m4a",
+  "TIPO EINSTEIN - DJ KATRIP_ DJ CZ_ MC JHEY FEAT. MC YURI(M4A_128K).m4a",
+  "Toma Tapa(M4A_128K).m4a",
+  "TROPA DO PISA - MC PH e TrapLaudo (GR6 Explode) DJ Murillo e LT No Beat(M4A_128K).m4a",
+  "Tropa do Sem K.O - MC_s Joãozinho VT_ Vine 7_ Tuto_ Duzinho SP_ Luuky e Ryan SP (Caio Passos)(M4A_128K).m4a",
+  "Tu Sentando(M4A_128K).m4a",
+  "Tubarão Gigante(M4A_128K).m4a",
+  "Tá Doida(M4A_128K).m4a",
+  "Tô na Brasilia com o Zigão(M4A_128K).m4a",
+  "Uma nora pra cada dia(M4A_128K).m4a",
+  "VAI NO CHÃO BANDIDA_ ELA VIU QUE O PAI É BRABO - Dj Guuh_ Mc Rodrigo Do Cn E Mc Talibã(M4A_128K).m4a",
+  "Vizinha Gostosa(M4A_128K).m4a",
+  "Vou Parar de Tomar Gin(M4A_128K).m4a",
+  "Vou pela Madrugada(M4A_128K).m4a",
+  "Whisky Importado - Nilo_ MC Marks _ MC Robs (Clipe Oficial) Prod - Dj Di Marques(M4A_128K).m4a",
+  "ZN DO PRIVACY(M4A_128K).m4a",
+  "ZN PITBULL (GP DA ZL) - MC JHEY(M4A_128K).m4a",
+  "_A BEBÊ QUER O QUE_ MC Cebezinho _ MC Don Juan_ MC GP_ Menor Richard - DJ Oreia(M4A_128K).m4a",
+  "_Longe de Magnata_ - MC Tuto_ MC Vine7_ MC Joãozinho VT_ Borges_ MC Kako e Chefin (Deejhay RB)(M4A_128K).m4a",
+  "_Olha Pra Minha Cara Não_ MC Cebezinho_ MC Ryan SP_ MC Luuky_ MC Menor K_ Menor Richard - DJ Oreia(M4A_128K).m4a",
+  "__Banco do Carona__ - Don Juan_ Marks_ Joaozinho VT_ Kako_ Robs_ Gabb e Vine 7 (GR6 Explode) DJ Boy(M4A_128K).m4a",
+  "__DESACATO__ Luuky_ Ryan SP_ Davi_ Traplaudo_ Don Juan_ Kadu_ Gui da Norte (GR6 Explode)(M4A_128K).m4a",
+  "Água Rosa(M4A_128K).m4a",
+  "É OS BIGODES DA FIRMA - MC Paiva (Love Funk) SXSS(M4A_128K).m4a",
+  "É Os Pé Na Porta(M4A_128K).m4a",
+  "Ô Moça(M4A_128K).m4a"
 ];
 
+    let currentIndex = 0;
+    let shuffle = false;
+    let deferredPrompt;
 
-// =====================
-let currentIndex = 0;
-let shuffle = false;
-const audioPlayer = document.getElementById('audioPlayer');
-const playPauseBtn = document.getElementById('playPauseBtn');
-const currentMusicName = document.getElementById('currentMusicName');
-const musicList = document.getElementById('musicList');
+    const audio = document.getElementById('audioPlayer');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const currentName = document.getElementById('currentMusicName');
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+    const currentTimeEl = document.getElementById('currentTime');
+    const durationEl = document.getElementById('duration');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const musicList = document.getElementById('musicList');
+    const installBtn = document.getElementById('installBtn');
+    const downloadAppBtn = document.getElementById('downloadAppBtn');
 
-function loadMusic(index) {
-    currentIndex = index;
-    audioPlayer.src = "musics/" + musics[index];
-    audioPlayer.play();
-    updateActive();
-    updateName();
-    updatePlayPauseIcon(true);
-}
+    const ITEM_HEIGHT = 58;
 
-function updateActive() {
-    [...musicList.children].forEach((li, i) => {
-        li.classList.toggle("active-track", i === currentIndex);
-    });
-}
+    // === RENDERIZAÇÃO SEM DOWNLOAD ===
+    function renderAllItems() {
+      const fragment = document.createDocumentFragment();
+      musicList.innerHTML = '';
 
-function updateName() {
-    currentMusicName.textContent = musics[currentIndex]?.replace(".m4a", "") || "Nenhuma música tocando";
-}
-
-function nextMusic() {
-    if (!musics.length) return;
-    currentIndex = shuffle ? Math.floor(Math.random() * musics.length)
-                           : (currentIndex + 1) % musics.length;
-    loadMusic(currentIndex);
-}
-
-function prevMusic() {
-    if (!musics.length) return;
-    currentIndex = shuffle ? Math.floor(Math.random() * musics.length)
-                           : (currentIndex - 1 + musics.length) % musics.length;
-    loadMusic(currentIndex);
-}
-
-function toggleShuffle() {
-    shuffle = !shuffle;
-    alert(shuffle ? "🔀 Modo aleatório ativado" : "▶️ Ordem normal ativada");
-}
-
-function togglePlayPause() {
-    if (audioPlayer.paused) {
-        audioPlayer.play();
-        updatePlayPauseIcon(true);
-    } else {
-        audioPlayer.pause();
-        updatePlayPauseIcon(false);
-    }
-}
-
-function updatePlayPauseIcon(isPlaying) {
-    playPauseBtn.innerHTML = isPlaying
-        ? '<i class="bi bi-pause-fill"></i>'
-        : '<i class="bi bi-play-fill"></i>';
-}
-
-function renderList() {
-    musicList.innerHTML = "";
-    musics.forEach((name, i) => {
-        const li = document.createElement("li");
-        li.className = "list-group-item";
-        li.textContent = name.replace(".m4a", "");
+      musics.forEach((music, i) => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.textContent = music.replace(".m4a", "");
         li.onclick = () => loadMusic(i);
-        musicList.appendChild(li);
-    });
-}
+        if (i === currentIndex) li.classList.add('active-track');
+        fragment.appendChild(li);
+      });
 
-renderList();
-audioPlayer.onended = nextMusic;
-
-// =====================
-//    PWA INSTALL BUTTON
-// =====================
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-
-// Para testes: botão sempre visível
-installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        installBtn.style.display = 'none';
-        console.log('Resultado da instalação:', outcome);
-    } else {
-        alert("📲 Aqui normalmente abriria a instalação do PWA!");
+      musicList.appendChild(fragment);
     }
-});
 
-// Evento real (HTTPS/localhost)
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'inline-block';
-});
+    function updateActive() {
+      const items = musicList.querySelectorAll('.list-group-item');
+      items.forEach((li, i) => {
+        li.classList.toggle('active-track', i === currentIndex);
+      });
+    }
 
-// =====================
-//    SERVICE WORKER
-// =====================
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("Service Worker registrado!"))
-        .catch(err => console.log("Erro ao registrar o Service Worker:", err));
-}
-</script>
+    function loadMusic(index) {
+      if (index < 0 || index >= musics.length) return;
+      currentIndex = index;
+      audio.src = `musics/${musics[index]}`;
+      audio.load();
+      audio.play().catch(() => {});
+      updateUI();
+    }
 
+    function updateUI() {
+      currentName.textContent = musics[currentIndex]?.replace(".m4a", "") || "—";
+      updateActive();
+      musicList.scrollTop = currentIndex * ITEM_HEIGHT - (musicList.clientHeight / 2);
+    }
+
+    function nextMusic() {
+      currentIndex = shuffle ? Math.floor(Math.random() * musics.length) : (currentIndex + 1) % musics.length;
+      loadMusic(currentIndex);
+    }
+
+    function prevMusic() {
+      currentIndex = shuffle ? Math.floor(Math.random() * musics.length) : (currentIndex - 1 + musics.length) % musics.length;
+      loadMusic(currentIndex);
+    }
+
+    function togglePlayPause() {
+      audio.paused ? audio.play() : audio.pause();
+    }
+
+    function toggleShuffle() {
+      shuffle = !shuffle;
+      document.getElementById('shuffleBtn').innerHTML = shuffle
+        ? '<i class="bi bi-shuffle text-warning"></i>'
+        : '<i class="bi bi-shuffle"></i>';
+    }
+
+    function seek(e) {
+      const rect = progressContainer.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pos * audio.duration;
+    }
+
+    function formatTime(seconds) {
+      if (isNaN(seconds)) return "0:00";
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    audio.addEventListener('loadedmetadata', () => {
+      durationEl.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      const percent = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      progressBar.style.width = `${percent}%`;
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+    });
+
+    audio.addEventListener('play', () => playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i>');
+    audio.addEventListener('pause', () => playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i>');
+    audio.addEventListener('ended', nextMusic);
+
+    volumeSlider.addEventListener('input', () => {
+      audio.volume = volumeSlider.value / 100;
+    });
+
+    // === PWA: INSTALAR ===
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') installBtn.style.display = 'none';
+      deferredPrompt = null;
+    });
+
+    // === BOTÃO BAIXAR APP (APK) ===
+    downloadAppBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = 'app/funk-playlist.apk';
+      link.download = 'FunkPlaylist.apk';
+      link.click();
+    });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    }
+
+    window.addEventListener('load', () => {
+      renderAllItems();
+      if (musics.length > 0) loadMusic(0);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') { e.preventDefault(); togglePlayPause(); }
+      if (e.code === 'ArrowRight') nextMusic();
+      if (e.code === 'ArrowLeft') prevMusic();
+    });
+  </script>
 </body>
 </html>
