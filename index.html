@@ -99,14 +99,19 @@ h2 {
 </style>
 </head>
 <body>
-
-<div class="card player-card">
-    <h2 class="text-center mb-4">🎵 Playlist Funk 🎧</h2>
-
-    <audio id="audioPlayer" class="w-100 mb-2"></audio>
-
-    <p id="currentMusicName" class="text-center mb-3">Nenhuma música tocando</p>
-
+    
+    <div class="card player-card">
+        <h2 class="text-center mb-4">🎵 Playlist Funk 🎧</h2>
+        
+        <audio id="audioPlayer" class="w-100 mb-2"></audio>
+        
+        <p id="currentMusicName" class="text-center mb-3">Nenhuma música tocando</p>
+        
+        <!-- Botão de instalar app -->
+        <div class="text-center mt-3">
+            <button id="installBtn" class="btn-green">📲 Instalar App</button>
+        </div>
+        <br>
     <div class="row g-2 mb-4 text-center">
         <div class="col-3"><button class="btn-green w-100" onclick="prevMusic()"><i class="bi bi-skip-backward-fill"></i></button></div>
         <div class="col-3"><button class="btn-green w-100" onclick="togglePlayPause()" id="playPauseBtn"><i class="bi bi-play-fill"></i></button></div>
@@ -116,10 +121,6 @@ h2 {
 
     <ul id="musicList" class="list-group bg-transparent"></ul>
 
-    <!-- Botão de instalar app -->
-    <div class="text-center mt-3">
-        <button id="installBtn" class="btn-green">📲 Instalar App</button>
-    </div>
 </div>
 
 <script>
